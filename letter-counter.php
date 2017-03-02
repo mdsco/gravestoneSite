@@ -20,20 +20,32 @@ function exampleMenu(){
 
 function lc_filter_woocommerce_cart_product_price( $wc_price ) {
 
+	$current_key = CartItemKeyHolder::getCartItemKey();
+
 	$cost_per_letter = 5.00;
 
 	$dir = dirname(__DIR__);
 
-	$count_string = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
+	$count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
 
-	$count = (int) $count_string;
+	// $count_array = array();
+	$count_array = json_decode($count_object, true);
 
-	$wc_price += $count * $cost_per_letter;
+	$wc_price_int = (double) $wc_price;
 
-	$output = "<script>console.log( 'Price: " . $count_string . "' );</script>";
-	echo $output;
-	
-    return $wc_price; 
+	$count = 1.00;
+
+	if(array_key_exists ( $current_key , $count_array )){
+
+		$count = (double) $count_array[$current_key];
+
+		$wc_price_int += $count * $cost_per_letter;
+
+		return $wc_price_int;
+
+	}
+
+    return $wc_price;
 };
 
 function lc_clear_letter_count_file($thing){
@@ -52,15 +64,6 @@ function twentysixteen_child_scripts(){
 
 }
 
-function lc_this_function($session_data){
-
-		// $output = "<script>console.log( 'Result: " . count($session_data['check_cart_items']) . "' );</script>";
-		// echo $output;
-
-		return $session_data;
-
-}
-
 function lc_update_key_of_no_key_element($array_item, $item, $key){
 
 	$dir = dirname(__DIR__);
@@ -69,12 +72,10 @@ function lc_update_key_of_no_key_element($array_item, $item, $key){
 	$count_array = json_decode($count_object, true);
 
 	if(array_key_exists ( 'no_key' , $count_array )){
-	//if(($no_key_count_value = $count_array['no_key']) != null){
 
 		$no_key_count_value = $count_array['no_key'];
 
 		if(!array_key_exists ( $key , $count_array )){
-		// if($count_array[$key] == null){
 
 			$count_array[$key] = $no_key_count_value;
 			unset($count_array['no_key']);
@@ -86,25 +87,46 @@ function lc_update_key_of_no_key_element($array_item, $item, $key){
 
 	} else {
 
-		$output = "<script>console.log( 'Can access file: " . $count_object . " valueola is null '  );</script>";
-		echo $output;
+		// $output = "<script>console.log( 'Can access file: " . $count_object . " valueola is null '  );</script>";
+		// echo $output;
 	}
 
 	return $array_item;
 
 }
 
+function setCartItemKey($visible, $item, $key){
+
+	CartItemKeyHolder::setCartItemKey($key);
+
+	return $visible;
+
+}
+
 add_filter('woocommerce_get_price', 'lc_filter_woocommerce_cart_product_price'); 
 
-add_action('woocommerce_check_cart_items', 'lc_this_function');
+// add_filter('woocommerce_cart_item_price', 'lc_filter_woocommerce_cart_product_price', 10, 3); 
 
 //add_action('woocommerce_before_main_content', 'lc_clear_letter_count_file');
 
 add_filter('woocommerce_cart_item_product_id', 'lc_update_key_of_no_key_element', 10, 3);
 
-add_action('woocommerce_ajax_added_to_cart', function($product_id){
+add_filter('woocommerce_cart_item_visible', 'setCartItemKey', 10, 3);
 
-	return $product_id;
-});
+add_filter('woocommerce_widget_cart_item_visible', 'setCartItemKey', 10, 3);
 
 add_action('wp_enqueue_scripts', 'twentysixteen_child_scripts');
+
+class CartItemKeyHolder{
+    private static $cart_item_key = null;
+
+    public static function setCartItemKey($value)
+    {
+        self::$cart_item_key = $value;
+    }
+
+    public static function getCartItemKey()
+    {
+        return self::$cart_item_key;
+    }
+}
