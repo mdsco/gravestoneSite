@@ -30,7 +30,6 @@ function lc_filter_woocommerce_cart_product_price( $wc_price ) {
 
 	// $count_array = array();
 	$count_array = json_decode($count_object, true);
-
 	$wc_price_int = (double) $wc_price;
 
 	$count = 1.00;
@@ -47,6 +46,27 @@ function lc_filter_woocommerce_cart_product_price( $wc_price ) {
 
     return $wc_price;
 };
+
+function set_price_for_product_on_cart_item($wc_cart){
+
+	$cart = $wc_cart->get_cart();
+
+	foreach ( $cart as $cart_item_key => $values ) {
+		
+		CartItemKeyHolder::setCartItemKey($cart_item_key);
+
+		$_product = $values['data'];
+
+		if($_product != null){
+			$original_price = $_product->get_price();
+
+			$_product->set_price(lc_filter_woocommerce_cart_product_price( $original_price ));
+		}
+	}
+
+	return $wc_cart;
+
+}
 
 function lc_clear_letter_count_file($thing){
 
@@ -68,9 +88,17 @@ function lc_update_key_of_no_key_element($array_item, $item, $key){
 
 	$dir = dirname(__DIR__);
 
+	$count_array = array();
+
+	if(!file_exists($dir.'/marksPlugin/letter-count-log.txt')){
+
+		file_put_contents($dir.'/marksPlugin/letter-count-log.txt', json_encode($count_array));
+	
+	}
+	
 	$count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
 	$count_array = json_decode($count_object, true);
-
+	
 	if(array_key_exists ( 'no_key' , $count_array )){
 
 		$no_key_count_value = $count_array['no_key'];
@@ -85,13 +113,36 @@ function lc_update_key_of_no_key_element($array_item, $item, $key){
 
 		}
 
-	} else {
-
-		// $output = "<script>console.log( 'Can access file: " . $count_object . " valueola is null '  );</script>";
-		// echo $output;
 	}
 
 	return $array_item;
+
+}
+
+function remove_count_element_from_file($key){
+
+	
+
+	// $count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
+	// $count_array = json_decode($count_object, true);
+	
+	// if(array_key_exists ( 'no_key' , $count_array )){
+
+	// 	$no_key_count_value = $count_array['no_key'];
+
+	// 	if(!array_key_exists ( $key , $count_array )){
+
+	// 		$count_array[$key] = $no_key_count_value;
+	// 		unset($count_array['no_key']);
+	// 		$no_key_object = json_encode($count_array);
+
+	// 		file_put_contents($dir.'/marksPlugin/letter-count-log.txt', $no_key_object);
+
+	// 	}
+
+	// }
+
+	return $key;
 
 }
 
@@ -103,11 +154,9 @@ function setCartItemKey($visible, $item, $key){
 
 }
 
-add_filter('woocommerce_get_price', 'lc_filter_woocommerce_cart_product_price'); 
+add_action('woocommerce_remove_cart_item', 'remove_count_element_from_file'); 
 
-// add_filter('woocommerce_cart_item_price', 'lc_filter_woocommerce_cart_product_price', 10, 3); 
-
-//add_action('woocommerce_before_main_content', 'lc_clear_letter_count_file');
+add_filter('woocommerce_before_calculate_totals', 'set_price_for_product_on_cart_item');
 
 add_filter('woocommerce_cart_item_product_id', 'lc_update_key_of_no_key_element', 10, 3);
 
