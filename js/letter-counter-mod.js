@@ -75,24 +75,14 @@
 
 		}
 
-		// $(".single_add_to_cart_button").on('click', function(){
-
-		// 	getCorrectCharacterCount();
-
-		// });
-
 		// update character count on elementAdd
 		$this.on('elementAdd', function(){
-
 			getCorrectCharacterCount();
-
 		});
 
 		// update character count on elementDelete
 		$this.on('elementRemove', function(){
-
 			getCorrectCharacterCount();
-
 		});
 
 		$( document ).on('click', 'td.product-remove > a', function( event ){
@@ -101,9 +91,7 @@
 			var url = a.attr( 'href' );
 			var cart_item_key = getParameterByName('remove_item', url);
 
-			//alert("Got some here! " + );
-
-			$.ajax( {
+			$.ajax({
 
 				global: false,
 			    type: "POST",
@@ -118,7 +106,7 @@
 					console.log("Response: ", response);
 				}
 
-			) };
+			});
 
 		});
 
@@ -135,32 +123,6 @@
 		    return decodeURIComponent(results[2].replace(/\+/g, " "));
 
 		}
-
-		// var notify_remove = function( evt ) {
-
-			
-		// }
-
-			// evt.preventDefault();
-
-			// var $a = $( evt.currentTarget );
-			
-			// var $form = $a.parents( 'form' );
-
-			// block( $form );
-			// block( $( 'div.cart_totals' ) );
-
-			// $.ajax( {
-			// 	type:     'GET',
-			// 	url:      $a.attr( 'href' ),
-			// 	dataType: 'html',
-			// 	success: update_wc_div,
-			// 	complete: function() {
-			// 		unblock( $form );
-			// 		unblock( $( 'div.cart_totals' ) );
-			// 	}
-			// } );
-		
 
 	});
 

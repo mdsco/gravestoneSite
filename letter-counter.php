@@ -8,15 +8,15 @@ Author URI:
 Version: 0.1
 */
 
-add_action("admin_menu", "addMenu");
+// add_action("admin_menu", "addMenu");
 
-function addMenu(){
-	add_menu_page("Example Options", "Example Options", 4, "example_options", "exampleMenu");
-}
+// function addMenu(){
+// 	add_menu_page("Example Options", "Example Options", 4, "example_options", "exampleMenu");
+// }
 
-function exampleMenu(){
+// function exampleMenu(){
 	
-}
+// }
 
 function lc_filter_woocommerce_cart_product_price( $wc_price ) {
 
@@ -66,15 +66,6 @@ function set_price_for_product_on_cart_item($wc_cart){
 
 	return $wc_cart;
 
-}
-
-function lc_clear_letter_count_file($thing){
-
-	$dir = dirname(__DIR__);
-
-	$result = file_put_contents($dir.'/marksPlugin/letter-count-log.txt', '0');
-
-	return $thing;
 }
 
 function twentysixteen_child_scripts(){

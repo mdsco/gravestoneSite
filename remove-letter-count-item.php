@@ -2,7 +2,7 @@
 
 	if ($_REQUEST['action'] == 'write') {
 
-		$key = $_REQUEST['key'];
+		$key = $_REQUEST['key'];	
 
 		$countArray = array();
 
@@ -12,7 +12,8 @@
 		if ($file_exists) {
 
 			$letter_count_object = file_get_contents('letter-count-log.txt');
-			$countArray = json_decode($countArray, true);
+
+			$countArray = json_decode($letter_count_object, true);
 
 			unset($countArray[$key]);
 
@@ -20,7 +21,6 @@
 
         	file_put_contents('letter-count-log.txt', $json_object);
     	}
-
 	}
 
 ?>
