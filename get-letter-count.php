@@ -12,7 +12,7 @@
 
 		if ($file_exists) {
 			$letter_count_object = file_get_contents('letter-count-log.txt');
-        	file_put_contents($filename, 0);
+        	file_put_contents('letter-count-log.txt', 0);
     	}
 
 		if($letter_count_object == '' || !$file_exists){

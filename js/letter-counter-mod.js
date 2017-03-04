@@ -95,6 +95,73 @@
 
 		});
 
+		$( document ).on('click', 'td.product-remove > a', function( event ){
+
+			var a = $( event.currentTarget );
+			var url = a.attr( 'href' );
+			var cart_item_key = getParameterByName('remove_item', url);
+
+			//alert("Got some here! " + );
+
+			$.ajax( {
+
+				global: false,
+			    type: "POST",
+			    cache: false,
+			    dataType: "json",
+			    data: ({
+			        action: 'write',
+			        key : cart_item_key, 
+			    }),
+			    url: '/wordpress/wp-content/plugins/marksPlugin/remove-letter-count-item.php',
+			    success: function(response){
+					console.log("Response: ", response);
+				}
+
+			) };
+
+		});
+
+		function getParameterByName(name, url) {
+
+		    if (!url) {
+		      url = window.location.href;
+		    }
+		    name = name.replace(/[\[\]]/g, "\\$&");
+		    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+		        results = regex.exec(url);
+		    if (!results) return null;
+		    if (!results[2]) return '';
+		    return decodeURIComponent(results[2].replace(/\+/g, " "));
+
+		}
+
+		// var notify_remove = function( evt ) {
+
+			
+		// }
+
+			// evt.preventDefault();
+
+			// var $a = $( evt.currentTarget );
+			
+			// var $form = $a.parents( 'form' );
+
+			// block( $form );
+			// block( $( 'div.cart_totals' ) );
+
+			// $.ajax( {
+			// 	type:     'GET',
+			// 	url:      $a.attr( 'href' ),
+			// 	dataType: 'html',
+			// 	success: update_wc_div,
+			// 	complete: function() {
+			// 		unblock( $form );
+			// 		unblock( $( 'div.cart_totals' ) );
+			// 	}
+			// } );
+		
+
 	});
 
 })( jQuery );

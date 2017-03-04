@@ -119,33 +119,6 @@ function lc_update_key_of_no_key_element($array_item, $item, $key){
 
 }
 
-function remove_count_element_from_file($key){
-
-	
-
-	// $count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
-	// $count_array = json_decode($count_object, true);
-	
-	// if(array_key_exists ( 'no_key' , $count_array )){
-
-	// 	$no_key_count_value = $count_array['no_key'];
-
-	// 	if(!array_key_exists ( $key , $count_array )){
-
-	// 		$count_array[$key] = $no_key_count_value;
-	// 		unset($count_array['no_key']);
-	// 		$no_key_object = json_encode($count_array);
-
-	// 		file_put_contents($dir.'/marksPlugin/letter-count-log.txt', $no_key_object);
-
-	// 	}
-
-	// }
-
-	return $key;
-
-}
-
 function setCartItemKey($visible, $item, $key){
 
 	CartItemKeyHolder::setCartItemKey($key);
@@ -167,6 +140,7 @@ add_filter('woocommerce_widget_cart_item_visible', 'setCartItemKey', 10, 3);
 add_action('wp_enqueue_scripts', 'twentysixteen_child_scripts');
 
 class CartItemKeyHolder{
+	
     private static $cart_item_key = null;
 
     public static function setCartItemKey($value)
@@ -178,4 +152,5 @@ class CartItemKeyHolder{
     {
         return self::$cart_item_key;
     }
+
 }
