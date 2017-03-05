@@ -21,6 +21,13 @@ Version: 0.1
 	
 // }
 
+function twentysixteen_child_scripts(){
+
+    wp_register_script( 'Letter Counter', plugins_url( '/js/letter-counter-mod.js', __FILE__ ), array('jquery') );
+	wp_enqueue_script('Letter Counter');
+
+}
+
 function lc_filter_woocommerce_cart_product_price( $wc_price ) {
 
 	$current_key = CartItemKeyStorage::getCartItemKey();
@@ -33,7 +40,6 @@ function lc_filter_woocommerce_cart_product_price( $wc_price ) {
 
 		$count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
 	
-		// $count_array = array();
 		$count_array = json_decode($count_object, true);
 		$wc_price_int = (double) $wc_price;
 
@@ -75,13 +81,6 @@ function set_price_for_product_on_cart_item($wc_cart){
 
 }
 
-function twentysixteen_child_scripts(){
-
-    wp_register_script( 'Letter Counter', plugins_url( '/js/letter-counter-mod.js', __FILE__ ), array('jquery') );
-	wp_enqueue_script('Letter Counter');
-
-}
-
 function lc_update_key_of_no_key_element($array_item, $item, $key){
 
 	$dir = dirname(__DIR__);
@@ -119,13 +118,9 @@ function lc_update_key_of_no_key_element($array_item, $item, $key){
 
 function setCartItemKey($visible, $item, $key){
 
-
-	// print_r("Key: " . $key . "</br>");
-
 	CartItemKeyStorage::setCartItemKey($key);
 
 	return $visible;
-
 }
 
 add_action('woocommerce_remove_cart_item', 'remove_count_element_from_file'); 
@@ -139,19 +134,3 @@ add_filter('woocommerce_cart_item_visible', 'setCartItemKey', 10, 3);
 add_filter('woocommerce_widget_cart_item_visible', 'setCartItemKey', 10, 3);
 
 add_action('wp_enqueue_scripts', 'twentysixteen_child_scripts');
-
-// class CartItemKeyStorage{
-	
-//     private static $cart_item_key = null;
-
-//     public static function setCartItemKey($value)
-//     {
-//         self::$cart_item_key = $value;
-//     }
-
-//     public static function getCartItemKey()
-//     {
-//         return self::$cart_item_key;
-//     }
-
-// }

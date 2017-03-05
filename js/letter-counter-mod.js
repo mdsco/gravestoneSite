@@ -71,21 +71,15 @@
 					}
 				});
 
-				//set object in local storage (as string)
-				//localStorage.setItem('charCount', JSON.stringify(count + ""));
-
 			}
 
 		}
 
 		$this.on('productCreate', function(){
-			// alert('productCreate');
 			getCorrectCharacterCount();
 		});
 
 		$this.on('elementModify', function(){
-
-			// alert("this happened");
 			getCorrectCharacterCount();
 
 		});
