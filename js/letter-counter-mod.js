@@ -14,14 +14,16 @@
 			if(session !== null){
 				var key = session.match(/cart_item_key(.*?)\\/g);
 
-			if(key !== null){
-				for(var i = 0; i < key.length; i++){
+				if(key !== null){
+					
+					for(var i = 0; i < key.length; i++){
 
 						var noPrefix = key[i].replace('cart_item_key=','');
 						var noSuffix = noPrefix.replace('\\','');
 						key[i] = noSuffix;
 				
 					}
+
 				}
 			}
 
@@ -46,6 +48,7 @@
 						count = text.length;
 
 					}
+
 				}
 
 				$.ajax({
@@ -69,11 +72,23 @@
 				});
 
 				//set object in local storage (as string)
-				localStorage.setItem('charCount', JSON.stringify(count + ""));
+				//localStorage.setItem('charCount', JSON.stringify(count + ""));
 
 			}
 
 		}
+
+		$this.on('productCreate', function(){
+			// alert('productCreate');
+			getCorrectCharacterCount();
+		});
+
+		$this.on('elementModify', function(){
+
+			// alert("this happened");
+			getCorrectCharacterCount();
+
+		});
 
 		// update character count on elementAdd
 		$this.on('elementAdd', function(){

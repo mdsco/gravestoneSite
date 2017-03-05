@@ -1,4 +1,7 @@
 <?php
+
+require("CartItemKeyStorage.php");
+
 /*
 Plugin Name: Letter Counter
 Plugin URI:
@@ -20,29 +23,33 @@ Version: 0.1
 
 function lc_filter_woocommerce_cart_product_price( $wc_price ) {
 
-	$current_key = CartItemKeyHolder::getCartItemKey();
+	$current_key = CartItemKeyStorage::getCartItemKey();
 
 	$cost_per_letter = 5.00;
 
 	$dir = dirname(__DIR__);
 
-	$count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
+	if(file_exists($dir.'/marksPlugin/letter-count-log.txt')){
 
-	// $count_array = array();
-	$count_array = json_decode($count_object, true);
-	$wc_price_int = (double) $wc_price;
+		$count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
+	
+		// $count_array = array();
+		$count_array = json_decode($count_object, true);
+		$wc_price_int = (double) $wc_price;
 
-	$count = 1.00;
+		$count = 1.00;
 
-	if(array_key_exists ( $current_key , $count_array )){
+		if(array_key_exists ( $current_key , $count_array )){
 
-		$count = (double) $count_array[$current_key];
+			$count = (double) $count_array[$current_key];
 
-		$wc_price_int += $count * $cost_per_letter;
+			$wc_price_int += $count * $cost_per_letter;
 
-		return $wc_price_int;
+			return $wc_price_int;
 
-	}
+		}
+
+	}	
 
     return $wc_price;
 };
@@ -53,7 +60,7 @@ function set_price_for_product_on_cart_item($wc_cart){
 
 	foreach ( $cart as $cart_item_key => $values ) {
 		
-		CartItemKeyHolder::setCartItemKey($cart_item_key);
+		CartItemKeyStorage::setCartItemKey($cart_item_key);
 
 		$_product = $values['data'];
 
@@ -112,7 +119,10 @@ function lc_update_key_of_no_key_element($array_item, $item, $key){
 
 function setCartItemKey($visible, $item, $key){
 
-	CartItemKeyHolder::setCartItemKey($key);
+
+	// print_r("Key: " . $key . "</br>");
+
+	CartItemKeyStorage::setCartItemKey($key);
 
 	return $visible;
 
@@ -130,18 +140,18 @@ add_filter('woocommerce_widget_cart_item_visible', 'setCartItemKey', 10, 3);
 
 add_action('wp_enqueue_scripts', 'twentysixteen_child_scripts');
 
-class CartItemKeyHolder{
+// class CartItemKeyStorage{
 	
-    private static $cart_item_key = null;
+//     private static $cart_item_key = null;
 
-    public static function setCartItemKey($value)
-    {
-        self::$cart_item_key = $value;
-    }
+//     public static function setCartItemKey($value)
+//     {
+//         self::$cart_item_key = $value;
+//     }
 
-    public static function getCartItemKey()
-    {
-        return self::$cart_item_key;
-    }
+//     public static function getCartItemKey()
+//     {
+//         return self::$cart_item_key;
+//     }
 
-}
+// }
