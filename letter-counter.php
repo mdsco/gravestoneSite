@@ -1,6 +1,8 @@
 <?php
 
-require("CartItemKeyStorage.php");
+require("cart-item-key-storage.php");
+// require("database-querier.php");
+require("user-id-temp-storage.php");
 
 /*
 Plugin Name: Letter Counter
@@ -25,6 +27,8 @@ function twentysixteen_child_scripts(){
 
     wp_register_script( 'Letter Counter', plugins_url( '/js/letter-counter-mod.js', __FILE__ ), array('jquery') );
 	wp_enqueue_script('Letter Counter');
+	wp_register_script( 'JavascriptCookie', plugins_url( '/js/js-cookie-1.5.1/src/js.cookie.js', __FILE__ ), array('jquery') );
+	wp_enqueue_script('JavascriptCookie');
 
 }
 
@@ -34,13 +38,32 @@ function lc_filter_woocommerce_cart_product_price( $wc_price ) {
 
 	$cost_per_letter = 5.00;
 
-	$dir = dirname(__DIR__);
+	// $dir = dirname(__DIR__);
 
-	if(file_exists($dir.'/marksPlugin/letter-count-log.txt')){
+	$sql = "SELECT * FROM current_user_id;";
+    $result = DatabaseQuerier::queryDatabase($sql);
 
-		$count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
-	
-		$count_array = json_decode($count_object, true);
+    $stored_user_id = '';
+
+    while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        $stored_user_id = $row['user_id'];
+    }
+
+	$sql = "SELECT * FROM products_count WHERE id = '" . $stored_user_id . "';";
+	$result = DatabaseQuerier::queryDatabase($sql);
+
+	while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+
+		$count_object_from_db = $row['count_object'];
+
+		$count_array = json_decode($count_object_from_db, true);
+
+		// if(file_exists($dir.'/marksPlugin/letter-count-log.txt')){
+
+		// 	$count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
+		
+		// 	$count_array = json_decode($count_object, true);
+
 		$wc_price_int = (double) $wc_price;
 
 		$count = 1.00;
@@ -83,34 +106,62 @@ function set_price_for_product_on_cart_item($wc_cart){
 
 function lc_update_key_of_no_key_element($array_item, $item, $key){
 
-	$dir = dirname(__DIR__);
-
 	$count_array = array();
 
-	if(!file_exists($dir.'/marksPlugin/letter-count-log.txt')){
+	$sql = "SELECT * FROM current_user_id;";
+    $result = DatabaseQuerier::queryDatabase($sql);
 
-		file_put_contents($dir.'/marksPlugin/letter-count-log.txt', json_encode($count_array));
-	
-	}
-	
-	$count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
-	$count_array = json_decode($count_object, true);
-	
-	if(array_key_exists ( 'no_key' , $count_array )){
+    $stored_user_id = '';
 
-		$no_key_count_value = $count_array['no_key'];
+    while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+        $stored_user_id = $row['user_id'];
 
-		if(!array_key_exists ( $key , $count_array )){
+		$sql = "SELECT * FROM products_count WHERE id = '" . $stored_user_id . "';";
+		$result = DatabaseQuerier::queryDatabase($sql);
 
-			$count_array[$key] = $no_key_count_value;
-			unset($count_array['no_key']);
-			$no_key_object = json_encode($count_array);
+		while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 
-			file_put_contents($dir.'/marksPlugin/letter-count-log.txt', $no_key_object);
+			$count_object_from_db = $row['count_object'];
 
+			$count_array = json_decode($count_object_from_db, true);
+
+			if(array_key_exists ( 'no_key' , $count_array )){
+
+				$no_key_count_value = $count_array['no_key'];
+
+				if(!array_key_exists ( $key , $count_array )){
+
+					$count_array[$key] = $no_key_count_value;
+					unset($count_array['no_key']);
+					$cart_item_key_object = json_encode($count_array);
+
+					$updateStatement = "UPDATE products_count SET count_object = '"
+						 				. $cart_item_key_object . "' WHERE id = '" 
+	 					 				. $stored_user_id . "';";
+
+					DatabaseQuerier::insertIntoDatabase($updateStatement);
+
+				}
+
+			}
 		}
-
 	}
+
+	// if($count_object_from_db == '{}'){
+		
+	// 	$countArray['no_key'] = $char_count;    		
+	
+	// } else{
+
+	// 	$countArray = json_decode($count_object_from_db, true);
+	// 	$countArray[$product_key] = $char_count;
+
+	// }
+	
+	// $count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
+	// 
+	
+	//
 
 	return $array_item;
 
@@ -134,3 +185,12 @@ add_filter('woocommerce_cart_item_visible', 'setCartItemKey', 10, 3);
 add_filter('woocommerce_widget_cart_item_visible', 'setCartItemKey', 10, 3);
 
 add_action('wp_enqueue_scripts', 'twentysixteen_child_scripts');
+
+//For test
+// add_filter('	woocommerce_get_price_html', function($price){
+
+// 	print_r($price);
+
+// 	return $price;
+
+// });
