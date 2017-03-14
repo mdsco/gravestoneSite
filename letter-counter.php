@@ -1,7 +1,6 @@
 <?php
 
 require("cart-item-key-storage.php");
-// require("database-querier.php");
 require("user-id-temp-storage.php");
 
 /*
@@ -29,6 +28,8 @@ function twentysixteen_child_scripts(){
 	wp_enqueue_script('Letter Counter');
 	wp_register_script( 'JavascriptCookie', plugins_url( '/js/js-cookie-1.5.1/src/js.cookie.js', __FILE__ ), array('jquery') );
 	wp_enqueue_script('JavascriptCookie');
+	wp_register_script( 'MoneyJS', plugins_url( '/js/js-master/money.js', __FILE__ ), array('jquery') );
+	wp_enqueue_script('MoneyJS');
 
 }
 
@@ -37,9 +38,7 @@ function lc_filter_woocommerce_cart_product_price( $wc_price ) {
 	$current_key = CartItemKeyStorage::getCartItemKey();
 
 	$cost_per_letter = 5.00;
-
-	// $dir = dirname(__DIR__);
-
+	
 	$sql = "SELECT * FROM current_user_id;";
     $result = DatabaseQuerier::queryDatabase($sql);
 
@@ -57,12 +56,6 @@ function lc_filter_woocommerce_cart_product_price( $wc_price ) {
 		$count_object_from_db = $row['count_object'];
 
 		$count_array = json_decode($count_object_from_db, true);
-
-		// if(file_exists($dir.'/marksPlugin/letter-count-log.txt')){
-
-		// 	$count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
-		
-		// 	$count_array = json_decode($count_object, true);
 
 		$wc_price_int = (double) $wc_price;
 
@@ -147,22 +140,6 @@ function lc_update_key_of_no_key_element($array_item, $item, $key){
 		}
 	}
 
-	// if($count_object_from_db == '{}'){
-		
-	// 	$countArray['no_key'] = $char_count;    		
-	
-	// } else{
-
-	// 	$countArray = json_decode($count_object_from_db, true);
-	// 	$countArray[$product_key] = $char_count;
-
-	// }
-	
-	// $count_object = file_get_contents($dir.'/marksPlugin/letter-count-log.txt');
-	// 
-	
-	//
-
 	return $array_item;
 
 }
@@ -174,8 +151,6 @@ function setCartItemKey($visible, $item, $key){
 	return $visible;
 }
 
-add_action('woocommerce_remove_cart_item', 'remove_count_element_from_file'); 
-
 add_filter('woocommerce_before_calculate_totals', 'set_price_for_product_on_cart_item');
 
 add_filter('woocommerce_cart_item_product_id', 'lc_update_key_of_no_key_element', 10, 3);
@@ -185,12 +160,3 @@ add_filter('woocommerce_cart_item_visible', 'setCartItemKey', 10, 3);
 add_filter('woocommerce_widget_cart_item_visible', 'setCartItemKey', 10, 3);
 
 add_action('wp_enqueue_scripts', 'twentysixteen_child_scripts');
-
-//For test
-// add_filter('	woocommerce_get_price_html', function($price){
-
-// 	print_r($price);
-
-// 	return $price;
-
-// });

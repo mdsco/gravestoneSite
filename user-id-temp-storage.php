@@ -21,13 +21,7 @@
 
             DatabaseQuerier::insertIntoDatabase($sqlInsert);
         }
-        // $sql = "SELECT * FROM current_user_id;";
-        // $result = DatabaseQuerier::queryDatabase($sql);
-
-        // while($row = $result->fetch(PDO::FETCH_ASSOC)) {
-        //     $user_id = $row['user_id'];
-        // }
-
+        
     }
 
 ?>

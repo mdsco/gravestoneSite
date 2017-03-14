@@ -10,19 +10,11 @@
 		$countArray = array();
 
 		error_log("remove-letter is passed in: " . $user_id);
-		// $file_exists = file_exists('letter-count-log.txt');
 
-		$sql = "SELECT * FROM products_count WHERE id = '$user_id';";
+		$sql = "SELECT * FROM products_count WHERE id = '" . $user_id . "';";
 		$result = DatabaseQuerier::queryDatabase($sql);
 
-		// error_log("remove-letter is passed in: " . $user_id);
-
-
-		// $letter_count_object;
-
 		if ($result) {
-			
-			// $count_object_from_db = '';
 
 			while($row = $result->fetch(PDO::FETCH_ASSOC)) {
 			
@@ -42,20 +34,6 @@
 			}
 
 		}
-
-		// if ($file_exists) {
-
-		// 	$letter_count_object = file_get_contents('letter-count-log.txt');
-
-		// 	$countArray = json_decode($letter_count_object, true);
-
-		// 	unset($countArray[$key]);
-
-		// 	$json_object = json_encode($countArray);
-
-  //       	file_put_contents('letter-count-log.txt', $json_object);
-  //   	}
-
 	}
 
 ?>

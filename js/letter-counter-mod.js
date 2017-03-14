@@ -31,7 +31,6 @@
 				    success: function(data, status){
 
 				    	var user_id = data.user_id;
-				    	// console.log("user id: ", user_id );
 					    Cookies.set('letter_counter_user_id', user_id, { expires: 3, path: '/wordpress/' });
 
 				    },
@@ -142,7 +141,6 @@
 						text += fancyProductDesigner.currentViewInstance.stage._objects[i].text;
 
 						// extract whitespace characters
-						// text = text.replace(/[^a-zA-Z0-9]/g, '');
 						text = text.replace(/[\s]/g, '');
 
 						//get character count
@@ -160,34 +158,103 @@
 
 		}
 
+		var getCurrencyCode = function(locale){
+			
+			switch(locale) {
+
+			    case 'fr-FR' :
+			        return "EUR";
+			    case 'en-GB':
+			        return "GBP"
+			    case 'en-HK':
+			        return "HKD";
+			    case 'en-US':
+			        return "USD";
+			    default:
+			    	return "USD";
+			
+			}
+
+		};
+
 		var updateProductPagePrice = function(){
 
 			if(fancyProductDesigner.currentViewInstance !== null){
 
-				var charCount = getCountOfCurrentlyDisplayedChars();
+				$.ajax({
 
-				var total = basePrice + (charCount * pricePerChar);
+					global: false,
+					type: "GET",
+					cache: false,
+					url : 'http://api.fixer.io/latest?base=USD',
+					success : function(data){
 
-				var userLang = navigator.language || navigator.userLanguage;
+						var rates = data;
+						var charCount = getCountOfCurrentlyDisplayedChars();
 
-				var currency = '';
+						var total = basePrice + (charCount * pricePerChar);
+						console.log("Total: " + total);
 
-				if(userLang == 'en-US'){
-					currency = '$';	
-				} else if(userLang == 'en-GB'){
-					currency = '&pound;';
-				}
+						var locale = navigator.language || navigator.userLanguage;
+						//locale = 'en-GB';
 
-				var dollarString = currency + total + ".00";
+						currencyCode = getCurrencyCode(locale);
 
-				$(".price > .woocommerce-Price-amount").html(dollarString);
+						fx.settings = { from: "USD" };
+
+						fx.base = rates.base;
+						fx.rates = rates.rates;
+					 
+						var convertVal = fx.convert(total, {to: currencyCode});
+
+						var dollarString = convertVal.toLocaleString(locale,{style:'currency',currency:currencyCode})
+
+						$(".price > .woocommerce-Price-amount").html(dollarString);
+						console.log("Did load ");
+					},
+					error: function(err){
+						console.log("Didn't load " + err);
+					}
+
+				});
+
+				// var charCount = getCountOfCurrentlyDisplayedChars();
+
+				// var total = basePrice + (charCount * pricePerChar);
+
+				// var locale = navigator.language || navigator.userLanguage;
+				// locale = 'en-GB';
+
+				// var rates = {};
+
+
+				// currencyCode = getCurrencyCode(locale);
+
+				// fx.settings = { from: "USD" };
+
+				// // fx.base = rates.base;
+				// // fx.rates = rates.rates;
+			 
+				// fx.base = 'USD';
+				// fx.rates = {
+								
+				// 	"GBP":0.81833,
+				// 	"HKD":7.7655,
+				// 	"EUR":0.93782,
+				// 	"USD":1
+				// };
+
+				// var convertVal = fx.convert(2, {to: currencyCode});
+
+				// var dollarString = convertVal.toLocaleString(locale,{style:'currency',currency:currencyCode})
+
+				// $(".price > .woocommerce-Price-amount").html(dollarString);
 			} 
 		}
 
 		getCartHash();
 
 		$this.on('productCreate', function(){
-			// alert("got here");
 			getCorrectCharacterCount();
 			updateProductPagePrice();
 		});
@@ -216,8 +283,6 @@
 			// cart_timeout = setTimeout( refresh_cart_fragment, day_in_ms );
 		});
 
-
-		// $( document ).on('click', '.cart > .single_add_to_cart_button', function( event ){
 		$( document ).on('mouseenter', '.cart > .single_add_to_cart_button', function( event ){
 
 			$.ajax({
